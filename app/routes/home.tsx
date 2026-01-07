@@ -1,7 +1,10 @@
 import Navbar from "~/components/Navbar";
 import type { Route } from "./+types/home";
-import { resumes } from "constants";
+import { resumes } from "../../constants";
 import ResumeCard from "~/components/ResumeCard";
+import { useNavigate } from "react-router";
+import { useEffect } from "react";
+import { usePuterStore } from "~/libs/puter";
 
 export function meta({ }: Route.MetaArgs) {
   return [
@@ -11,6 +14,16 @@ export function meta({ }: Route.MetaArgs) {
 }
 
 export default function Home() {
+  const { auth, isLoading } = usePuterStore();
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    // Wait until auth check finishes to avoid redirect flicker on initial load
+    if (!isLoading && !auth.isAuthenticated) {
+      navigate('/auth?next=/', { replace: true });
+    }
+  }, [auth.isAuthenticated, isLoading, navigate])
+
   return <main className="bg-[url('/images/bg-main.svg')] bg-cover">
     <Navbar />
 
@@ -21,7 +34,7 @@ export default function Home() {
       </div>
 
 
-      {resumes.length > 0 && (
+      {resumes?.length > 0 && (
         <div className="resumes-section">
           {resumes.map((resume) => (
             <ResumeCard key={resume.id} resume={resume} />
