@@ -8,15 +8,15 @@ export const meta = () => ([
 ])
 
 const auth = () => {
-  const { isLoading, auth } = usePuterStore();
+  const { isLoading, auth, error } = usePuterStore();
   const location = useLocation();
   const next = location.search.split("next=")[1];
   const navigate = useNavigate();
 
   useEffect(() => {
-    // Only redirect to "next" if user **is logged in**
-    if (!isLoading && auth.isAuthenticated && next) {
-      navigate(next, { replace: true });
+    // Only redirect if user **is logged in**
+    if (!isLoading && auth.isAuthenticated) {
+      navigate(next || "/", { replace: true });
     }
   }, [auth.isAuthenticated, isLoading, next, navigate]);
 
@@ -29,6 +29,7 @@ const auth = () => {
             <h2>Log In to Continue Your Job Journey</h2>
           </div>
           <div>
+            {error && <div className="text-red-500 mb-4 text-center">{error}</div>}
             {isLoading ? (
               <button className="auth-button animate-pulse">
                 <p>Signing you in ...</p>
